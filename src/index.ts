@@ -17,6 +17,7 @@ function createResource(
     routes: apiBuilder.Route<any, any>[],
 ) {
   const updatedResource = resource.replace(/\{(.*)}/g, ':$1');
+
   httpHandlers.forEach(({ httpMethod }) => {
     app[httpMethod.toLowerCase()](
         updatedResource,
@@ -60,4 +61,5 @@ function createResource(
         createResource(resource, httpHandlers, routes),
     );
 
+app.use(express.json());
 app.listen(port);
