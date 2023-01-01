@@ -16,7 +16,7 @@ function createResource(
     httpHandlers: apiBuilder.HttpHandler<any, any>[],
     routes: apiBuilder.Route<any, any>[],
 ) {
-  const updatedResource = resource.replace(/\{(.*)}/g, ':$1');
+  const updatedResource = resource.replace(/\{(.*?)}/g, ':$1');
 
   httpHandlers.forEach(({ httpMethod }) => {
     app[httpMethod.toLowerCase()](
