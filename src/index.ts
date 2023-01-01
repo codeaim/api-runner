@@ -31,6 +31,9 @@ function createResource(
             path: req.path,
             pathParameters: req.params,
             queryStringParameters: req.query,
+            requestContext: {
+              authorizer: { claims: req.headers.claims ?? { email: "admin@gitboard.io", admin: true }} as any
+            },
             multiValueQueryStringParameters: Object.keys(req.query).reduce(
                 (acc, key) => ({
                   ...acc,
@@ -39,7 +42,7 @@ function createResource(
                       : [req.query[key]],
                 }),
                 {},
-            ),
+            )
           } as APIGatewayProxyEvent)) as APIGatewayProxyResult;
           res
               .status(response.statusCode)
