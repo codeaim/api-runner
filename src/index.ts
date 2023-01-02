@@ -11,6 +11,8 @@ import apiBuilder from '@codeaim/api-builder';
 const app = express();
 const port = 5001;
 
+app.use(express.json());
+
 function createResource(
     resource: string,
     httpHandlers: apiBuilder.HttpHandler<any, any>[],
@@ -23,7 +25,7 @@ function createResource(
         updatedResource,
         async (req: Request, res: Response) => {
           const api = await import(`${process.argv[2]}?update=${Date.now()}`);
-          const response = (await api.handler({
+          const event = ({
             resource: resource,
             httpMethod: httpMethod.toUpperCase(),
             headers: req.headers as APIGatewayProxyEvent['headers'],
@@ -32,18 +34,19 @@ function createResource(
             pathParameters: req.params,
             queryStringParameters: req.query,
             requestContext: {
-              authorizer: { claims: req.headers.claims ?? { email: "admin@gitboard.io", admin: true }} as any
+                authorizer: { claims: req.headers.claims ?? { email: "admin@gitboard.io", admin: true }} as any
             },
             multiValueQueryStringParameters: Object.keys(req.query).reduce(
-                (acc, key) => ({
-                  ...acc,
-                  [key]: Array.isArray(req.query[key])
-                      ? req.query[key]
-                      : [req.query[key]],
-                }),
-                {},
+              (acc, key) => ({
+                ...acc,
+                [key]: Array.isArray(req.query[key])
+                  ? req.query[key]
+                  : [req.query[key]],
+              }),
+              {},
             )
-          } as APIGatewayProxyEvent)) as APIGatewayProxyResult;
+          } as APIGatewayProxyEvent)
+          const response = await api.handler(event) as APIGatewayProxyResult;
           res
               .status(response.statusCode)
               .set(response.headers)
@@ -57,12 +60,12 @@ function createResource(
   );
 }
 
-(await import(`${process.argv[2]}?update=${Date.now()}`))
+const routes = (await import(`${process.argv[2]}?update=${Date.now()}`))
     .api
     .apiRoutes()
-    .forEach(({ resource, httpHandlers, routes }) =>
+
+    routes.forEach(({ resource, httpHandlers, routes }) =>
         createResource(resource, httpHandlers, routes),
     );
 
-app.use(express.json());
 app.listen(port);
