@@ -13,6 +13,18 @@ const port = process.env.API_PORT ?? 5001;
 
 app.use(express.json());
 
+function extractCognitoClaims(req: Request) {
+    const includeClaims = process.env.API_INCLUDE_COGNITO_CLAIMS
+    if(includeClaims && req.headers["authorization"]) {
+        const token = req.headers["authorization"].substring(7);
+        const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+        return {
+            ...decoded,
+            'cognito:groups': decoded['cognito:groups'].join(",")
+        }
+    }
+    return {}
+}
 function createResource(
     resource: string,
     httpHandlers: apiBuilder.HttpHandler<any, any>[],
@@ -34,7 +46,7 @@ function createResource(
             pathParameters: req.params,
             queryStringParameters: req.query,
             requestContext: {
-                authorizer: { claims: req.headers.claims ? JSON.parse(req.headers.claims) : {}} as any
+                authorizer: { claims: extractCognitoClaims(req)} as any
             },
             multiValueQueryStringParameters: Object.keys(req.query).reduce(
               (acc, key) => ({
