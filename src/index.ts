@@ -34,7 +34,7 @@ function createResource(
             pathParameters: req.params,
             queryStringParameters: req.query,
             requestContext: {
-                authorizer: { claims: req.headers.claims ?? { email: "admin@gitboard.io", admin: true }} as any
+                authorizer: { claims: req.headers.claims ?? {}} as any
             },
             multiValueQueryStringParameters: Object.keys(req.query).reduce(
               (acc, key) => ({
