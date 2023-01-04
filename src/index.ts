@@ -9,7 +9,7 @@ import {
 import apiBuilder from '@codeaim/api-builder';
 
 const app = express();
-const port = 5001;
+const port = process.env.API_PORT ?? 5001;
 
 app.use(express.json());
 
