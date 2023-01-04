@@ -41,7 +41,7 @@ function createResource(
             resource: resource,
             httpMethod: httpMethod.toUpperCase(),
             headers: req.headers as APIGatewayProxyEvent['headers'],
-            body: req.body,
+            body: JSON.stringify(req.body),
             path: req.path,
             pathParameters: req.params,
             queryStringParameters: req.query,
