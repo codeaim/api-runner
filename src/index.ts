@@ -1,6 +1,7 @@
 #!/usr/bin/env npx ts-node
 
 import express from 'express';
+import cors from 'cors';
 import { Request, Response } from 'express';
 import {
   APIGatewayProxyEvent,
@@ -12,6 +13,7 @@ const app = express();
 const port = process.env.API_PORT ?? 5001;
 
 app.use(express.json());
+app.use(cors())
 
 function extractCognitoClaims(req: Request) {
     const includeClaims = process.env.API_INCLUDE_COGNITO_CLAIMS
