@@ -1,7 +1,6 @@
 #!/usr/bin/env npx ts-node
 
 import express from 'express';
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import { Request, Response } from 'express';
 import {
@@ -14,8 +13,8 @@ const app = express();
 const port = process.env.API_PORT ?? 5001;
 
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(express.json());
+app.use(express.urlencoded());
 
 function extractCognitoClaims(req: Request) {
     const includeClaims = process.env.API_INCLUDE_COGNITO_CLAIMS
@@ -45,7 +44,7 @@ function createResource(
             resource: resource,
             httpMethod: httpMethod.toUpperCase(),
             headers: req.headers as APIGatewayProxyEvent['headers'],
-            body: JSON.stringify(req.body),
+            body: JSON.stringify(req.is('application/x-www-form-urlencoded') ? JSON.parse(Object.keys(req.body)[0]) : req.body),
             path: req.path,
             pathParameters: req.params,
             queryStringParameters: req.query,
