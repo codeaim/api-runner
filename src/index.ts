@@ -23,7 +23,7 @@ function extractCognitoClaims(req: Request) {
         const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
         return {
             ...decoded,
-            'cognito:groups': decoded['cognito:groups'].join(",")
+            'cognito:groups': decoded['cognito:groups']?.join(",")
         }
     }
     return {}
