@@ -46,7 +46,13 @@ function createResource(
             headers: req.headers as APIGatewayProxyEvent['headers'],
             body: JSON.stringify(req.is('application/x-www-form-urlencoded') ? JSON.parse(Object.keys(req.body)[0]) : req.body),
             path: req.path,
-            pathParameters: req.params,
+            pathParameters:Object.keys(req.params).reduce(
+                (acc, key) => ({
+                    ...acc,
+                    [key]: encodeURIComponent(req.params[key]),
+                }),
+                {},
+            ),
             queryStringParameters: req.query,
             requestContext: {
                 authorizer: { claims: extractCognitoClaims(req)} as any
