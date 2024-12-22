@@ -41,7 +41,7 @@ function createResource(
     app[httpMethod.toLowerCase()](
       updatedResource,
       async (req: Request, res: Response) => {
-        const api = await import(`${process.argv[2]}?update=${Date.now()}`);
+        const { api } = await import(`${process.argv[2]}?update=${Date.now()}`);
         const event = {
           resource: resource,
           httpMethod: httpMethod.toUpperCase(),
