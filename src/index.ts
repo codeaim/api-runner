@@ -7,7 +7,6 @@ import {
   APIGatewayProxyEvent,
   APIGatewayProxyResult,
 } from 'aws-lambda/trigger/api-gateway-proxy';
-import apiBuilder from '@codeaim/api-builder';
 
 const app = express();
 const port = process.env.API_PORT ?? 5001;
@@ -36,7 +35,6 @@ function createResource(
   handler: string
 ) {
   const updatedPath = path.replace(/\{(.*?)}/g, ':$1');
-  const handlerName = handler;
 
     app[method.toLowerCase()](
       updatedPath,
@@ -73,7 +71,7 @@ function createResource(
             {},
           ),
         } as APIGatewayProxyEvent;
-        const response = (await api[handlerName](event)) as APIGatewayProxyResult;
+        const response = (await api[handler](event)) as APIGatewayProxyResult;
         res
           .status(response.statusCode)
           .set(response.headers)
