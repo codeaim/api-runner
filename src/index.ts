@@ -33,7 +33,7 @@ function extractCognitoClaims(req: Request) {
 function createResource(
   method: string,
   path: string,
-  handler: (event:  APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>
+  handler: string
 ) {
   const updatedPath = path.replace(/\{(.*?)}/g, ':$1');
 
@@ -72,7 +72,7 @@ function createResource(
             {},
           ),
         } as APIGatewayProxyEvent;
-        const response = (await api.handler(event)) as APIGatewayProxyResult;
+        const response = (await api[handler](event)) as APIGatewayProxyResult;
         res
           .status(response.statusCode)
           .set(response.headers)
