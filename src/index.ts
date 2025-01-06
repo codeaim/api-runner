@@ -31,20 +31,19 @@ function extractCognitoClaims(req: Request) {
   return {};
 }
 function createResource(
-  resource: string,
-  httpHandlers: apiBuilder.HttpHandler<any, any>[],
-  routes: apiBuilder.Route<any, any>[],
+  method: string,
+  path: string,
+  handler: (event:  APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>
 ) {
-  const updatedResource = resource.replace(/\{(.*?)}/g, ':$1');
+  const updatedPath = path.replace(/\{(.*?)}/g, ':$1');
 
-  httpHandlers.forEach(({ httpMethod }) => {
-    app[httpMethod.toLowerCase()](
-      updatedResource,
+    app[method.toLowerCase()](
+      updatedPath,
       async (req: Request, res: Response) => {
         const { api } = await import(`${process.argv[2]}?update=${Date.now()}`);
         const event = {
-          resource: resource,
-          httpMethod: httpMethod.toUpperCase(),
+          resource: updatedPath,
+          httpMethod: method.toUpperCase(),
           headers: req.headers as APIGatewayProxyEvent['headers'],
           body: JSON.stringify(
             req.is('application/x-www-form-urlencoded')
@@ -80,19 +79,15 @@ function createResource(
           .json(JSON.parse(response.body));
       },
     );
-    console.log(`${httpMethod} http://localhost:${port}${updatedResource}`);
-  });
-  routes.forEach(({ resource: nestedResource, httpHandlers, routes }) =>
-    createResource(`${resource}${nestedResource}`, httpHandlers, routes),
-  );
+    console.log(`${method} http://localhost:${port}${updatedPath}`);
 }
 
 const routes = (
   await import(`${process.argv[2]}?update=${Date.now()}`)
-).api.apiRoutes();
+).api.routes;
 
-routes.forEach(({ resource, httpHandlers, routes }) =>
-  createResource(resource, httpHandlers, routes),
+routes.forEach(({ method, path, handler }) =>
+  createResource(method, path, handler),
 );
 
 app.listen(port);
