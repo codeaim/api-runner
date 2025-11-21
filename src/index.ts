@@ -22,10 +22,10 @@ function extractCognitoClaims(req: Request) {
     const decoded = JSON.parse(
       Buffer.from(token.split('.')[1], 'base64').toString(),
     );
-    return { jwt: {
+    return {
       ...decoded,
       'cognito:groups': decoded['cognito:groups']?.join(','),
-    }};
+    };
   }
   return {};
 }
@@ -59,7 +59,7 @@ function createResource(
           ),
           queryStringParameters: req.query,
           requestContext: {
-            authorizer: { claims: extractCognitoClaims(req) } as any,
+            authorizer: { jwt: { claims: extractCognitoClaims(req) }} as any,
           },
           multiValueQueryStringParameters: Object.keys(req.query).reduce(
             (acc, key) => ({
