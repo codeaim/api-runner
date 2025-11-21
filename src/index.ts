@@ -22,10 +22,10 @@ function extractCognitoClaims(req: Request) {
     const decoded = JSON.parse(
       Buffer.from(token.split('.')[1], 'base64').toString(),
     );
-    return {
+    return { jwt: {
       ...decoded,
       'cognito:groups': decoded['cognito:groups']?.join(','),
-    };
+    }};
   }
   return {};
 }
